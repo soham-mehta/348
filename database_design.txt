@@ -1,0 +1,89 @@
+Users(
+  user_id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100),
+  email VARCHAR(100) UNIQUE
+)
+
+
+
+
+Companies(
+  company_id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100),
+  industry VARCHAR(100),
+  location VARCHAR(100),
+  website VARCHAR(255)
+)
+
+
+
+Statuses(
+  status_id INT PRIMARY KEY AUTO_INCREMENT,
+  label VARCHAR(50)
+)
+
+
+
+
+
+
+MAIN:
+Applications(
+  application_id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT,
+  company_id INT,
+  status_id INT,
+  position_title VARCHAR(100),
+  date_applied DATE,
+  source VARCHAR(100),
+  notes TEXT,
+
+  FOREIGN KEY (user_id) REFERENCES Users(user_id),
+  FOREIGN KEY (company_id) REFERENCES Companies(company_id),
+  FOREIGN KEY (status_id) REFERENCES Statuses(status_id)
+)
+
+
+
+
+
+Interviews(
+  interview_id INT PRIMARY KEY AUTO_INCREMENT,
+  application_id INT,
+  date DATE,
+  round_number INT,
+  type VARCHAR(50),          -- e.g., "Phone", "Technical", "Onsite"
+  feedback TEXT,
+
+  FOREIGN KEY (application_id) REFERENCES Applications(application_id)
+)
+
+
+
+
+
+
+
+
+
+
+Tasks(
+  task_id INT PRIMARY KEY AUTO_INCREMENT,
+  application_id INT,
+  due_date DATE,
+  description VARCHAR(255),
+  completed BOOLEAN,
+
+  FOREIGN KEY (application_id) REFERENCES Applications(application_id)
+)
+
+
+
+
+
+
+
+
+
+
+

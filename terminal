@@ -1,0 +1,9 @@
+mkdir internship-tracker
+cd internship-tracker
+mkdir backend frontend
+cd backend
+npm init -y
+npm install express mongoose cors dotenv 
+cd ../frontend
+npx create-react-app .
+npm install axios react-router-dom bootstrap 
