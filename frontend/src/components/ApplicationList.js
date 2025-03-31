@@ -10,6 +10,8 @@ const ApplicationList = () => {
   const [error, setError] = useState(null);
   const [users, setUsers] = useState([]);
   const [statuses, setStatuses] = useState([]);
+  const [timeline, setTimeline] = useState([]);
+  const [positionCounts, setPositionCounts] = useState([]);
   
   // Filter states
   const [filters, setFilters] = useState({
@@ -39,11 +41,17 @@ const ApplicationList = () => {
           axios.get('http://localhost:5001/api/statuses')
         ]);
         
+        // Fetch the simple position counts
+        const positionCountsRes = await axios.get('http://localhost:5001/api/reports/simple-position-counts');
+        setPositionCounts(positionCountsRes.data);
+        
         console.log('API Response:', appsRes.data);
         setApplications(appsRes.data);
         setFilteredApplications(appsRes.data);
         setUsers(usersRes.data);
         setStatuses(statusesRes.data);
+        const timelineRes = await axios.get('http://localhost:5001/api/reports/application-timeline');
+        setTimeline(timelineRes.data);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching data:', err);
@@ -294,6 +302,60 @@ const ApplicationList = () => {
           
           {/* Position Statistics Component */}
           <PositionStatistics filters={filters} />
+
+          {/* Application Timeline */}
+          <div className="card shadow-sm mb-4">
+            <div className="card-header bg-light">
+              <h5 className="mb-0 fs-6 fw-bold">Application Timeline</h5>
+            </div>
+            <div className="card-body">
+              <div className="table-responsive">
+                <table className="table table-sm table-hover">
+                  <thead>
+                    <tr>
+                      <th>Month</th>
+                      <th>Count</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {timeline.map((item, index) => (
+                      <tr key={index}>
+                        <td className="small">{item.period}</td>
+                        <td className="small">{item.count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* Position Counts (Sanitized Query Demo) */}
+          <div className="card shadow-sm mb-4">
+            <div className="card-header bg-light">
+              <h5 className="mb-0 fs-6 fw-bold">Position Counts (Sanitized Query Demo)</h5>
+            </div>
+            <div className="card-body">
+              <div className="table-responsive">
+                <table className="table table-sm table-hover">
+                  <thead>
+                    <tr>
+                      <th>Position</th>
+                      <th>Count</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {positionCounts.map((item, index) => (
+                      <tr key={index}>
+                        <td className="small">{item.position}</td>
+                        <td className="small">{item.count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
         
         {/* Main Content */}
