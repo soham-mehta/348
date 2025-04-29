@@ -38,13 +38,13 @@ const getApplicationsByDateRange = async (startDate, endDate) => {
  * Uses proper parameter sanitization to prevent injection attacks
  */
 const getApplicationStatistics = async (filters = {}) => {
-  // Build query with sanitized parameters
+  // First, it creates a sanitized query object
   const query = {};
   
+  // It sanitizes each filter parameter before adding to query
   if (filters.user) {
-    // Sanitize ObjectId
     try {
-      query.user = mongoose.Types.ObjectId(filters.user);
+      query.user = mongoose.Types.ObjectId(filters.user);  // Sanitizes by ensuring valid MongoDB ObjectId
     } catch (err) {
       throw new Error('Invalid user ID format');
     }
@@ -82,13 +82,12 @@ const getApplicationStatistics = async (filters = {}) => {
     }
   }
   
-  // Get applications with the sanitized query
+  // Gets applications using the sanitized query
   const applications = await Application.find(query).populate('status');
   
-  // Calculate statistics
+  // Calculates statistics in memory
   const total = applications.length;
   const statusCounts = {};
-  
   applications.forEach(app => {
     if (app.status && app.status.label) {
       statusCounts[app.status.label] = (statusCounts[app.status.label] || 0) + 1;
