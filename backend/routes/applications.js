@@ -3,6 +3,7 @@ const router = express.Router();
 const Application = require('../models/Application');
 const Company = require('../models/Company');
 const mongoose = require('mongoose');
+const { executeTransaction, TransactionLevels } = require('../utils/transactionManager');
 
 // Get all applications
 router.get('/', async (req, res) => {
@@ -86,6 +87,87 @@ router.delete('/:id', async (req, res) => {
     
     await Application.deleteOne({ _id: req.params.id });
     res.json({ message: 'Application deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Transfer application between users (with transaction)
+router.post('/:id/transfer', async (req, res) => {
+  try {
+    const { newUserId, isolationLevel = 'SERIALIZABLE' } = req.body;
+    const applicationId = req.params.id;
+
+    // Define the transaction operations
+    const transferOperations = async (session) => {
+      // Find and update application
+      const application = await Application.findById(applicationId).session(session);
+      if (!application) {
+        throw new Error('Application not found');
+      }
+
+      const oldUserId = application.user;
+      application.user = newUserId;
+      
+      // Save the changes within the transaction
+      await application.save({ session });
+
+      // Return the updated application
+      return {
+        message: 'Application transferred successfully',
+        from: oldUserId,
+        to: newUserId,
+        application
+      };
+    };
+
+    // Execute the transfer within a transaction
+    const result = await executeTransaction(
+      transferOperations,
+      TransactionLevels[isolationLevel]
+    );
+
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Bulk update applications with transaction
+router.post('/bulk-update', async (req, res) => {
+  try {
+    const { updates, isolationLevel = 'SERIALIZABLE' } = req.body;
+
+    const bulkUpdateOperations = async (session) => {
+      const results = [];
+      
+      // Perform all updates within the same transaction
+      for (const update of updates) {
+        const application = await Application.findById(update.id).session(session);
+        if (!application) {
+          throw new Error(`Application ${update.id} not found`);
+        }
+
+        // Update the application fields
+        Object.assign(application, update.changes);
+        await application.save({ session });
+        
+        results.push(application);
+      }
+
+      return {
+        message: 'Bulk update completed successfully',
+        updatedApplications: results
+      };
+    };
+
+    // Execute bulk update within a transaction
+    const result = await executeTransaction(
+      bulkUpdateOperations,
+      TransactionLevels[isolationLevel]
+    );
+
+    res.json(result);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -7,6 +7,7 @@ const {
   getSimplePositionCounts,
   getApplicationTimeline
 } = require('../utils/sanitizedQueries');
+const { analyzeQuery } = require('../utils/queryAnalyzer');
 
 // Get applications by date range using sanitized query
 router.get('/applications-by-date', async (req, res) => {
@@ -76,6 +77,35 @@ router.get('/application-timeline', async (req, res) => {
     const { userId } = req.query;
     const result = await getApplicationTimeline(userId);
     res.json(result);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// New endpoint to test index usage
+router.get('/analyze-query', async (req, res) => {
+  try {
+    const { status, position_title, dateFrom, dateTo } = req.query;
+    const query = {};
+
+    if (status) {
+      query.status = status;
+    }
+    if (position_title) {
+      query.position_title = position_title;
+    }
+    if (dateFrom || dateTo) {
+      query.date_applied = {};
+      if (dateFrom) {
+        query.date_applied.$gte = new Date(dateFrom);
+      }
+      if (dateTo) {
+        query.date_applied.$lte = new Date(dateTo);
+      }
+    }
+
+    const analysis = await analyzeQuery(query);
+    res.json(analysis);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
