@@ -36,7 +36,7 @@ const ApplicationForm = () => {
     'Data Scientist',
     'Data Engineer'
   ];
-
+  //Dynamic Data Fetching
   useEffect(() => {
     const fetchData = async () => {
       try {

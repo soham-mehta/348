@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+//SCHEMA
 const applicationSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -15,7 +15,7 @@ const applicationSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Status',
     required: true,
-    index: true
+    index: true // index defintion
   },
   position_title: {
     type: String,

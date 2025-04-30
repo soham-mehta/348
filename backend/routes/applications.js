@@ -45,11 +45,11 @@ router.post('/', async (req, res) => {
   });
 
   try {
-    const newApplication = await application.save();
+    const newApplication = await application.save(); //SAVE
     
     // Populate the references
     const populatedApp = await Application.findById(newApplication._id)
-      .populate('user')
+      ('u.populateser')
       .populate('status');
     
     res.status(201).json(populatedApp);

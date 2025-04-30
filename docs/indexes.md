@@ -1,7 +1,7 @@
 # Database Indexes Documentation
 
 ## Overview
-This document describes the indexes implemented in our job application tracking system, their purposes, and the queries they support. Our application uses MongoDB with Mongoose ODM, and we have implemented strategic indexes to optimize query performance for common operations.
+This document describes the indexes implemented in my job application tracking system, their purposes, and the queries they support. My application uses MongoDB with Mongoose ODM, and I have implemented certain indexes to optimize query performance for common operations.
 
 ## Index Definitions
 All indexes are defined in `backend/models/Application.js`:
@@ -93,25 +93,7 @@ const getApplicationTimeline = async (userId = null) => {
 };
 ```
 
-## Performance Impact
-- Status queries show improved performance with ~80% reduction in document scans
-- Date range queries benefit from targeted index scans instead of collection scans
-- Compound index improves complex queries combining status and date filters
 
-## Index Maintenance
-Indexes are automatically created and maintained through Mongoose:
-```javascript
-// In backend/models/Application.js
-applicationSchema.set('autoIndex', true);
-Application.createIndexes();
-```
 
 ## Monitoring Index Usage
 We use MongoDB's explain() function to verify index usage:
-```javascript
-// In backend/utils/queryAnalyzer.js
-const analyzeQuery = async (query) => {
-  const explanation = await Application.find(query).explain('executionStats');
-  // Analysis of query performance and index usage
-};
-``` 

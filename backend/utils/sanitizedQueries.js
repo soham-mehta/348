@@ -44,7 +44,7 @@ const getApplicationStatistics = async (filters = {}) => {
   // It sanitizes each filter parameter before adding to query
   if (filters.user) {
     try {
-      query.user = mongoose.Types.ObjectId(filters.user);  // Sanitizes by ensuring valid MongoDB ObjectId
+      query.user = mongoose.Types.ObjectId(filters.user);  // Sanitizes 
     } catch (err) {
       throw new Error('Invalid user ID format');
     }
@@ -60,7 +60,7 @@ const getApplicationStatistics = async (filters = {}) => {
   
   if (filters.status) {
     try {
-      query.status = mongoose.Types.ObjectId(filters.status);
+      query.status = mongoose.Types.ObjectId(filters.status); //Index Usage 
     } catch (err) {
       throw new Error('Invalid status ID format');
     }
@@ -83,7 +83,7 @@ const getApplicationStatistics = async (filters = {}) => {
   }
   
   // Gets applications using the sanitized query
-  const applications = await Application.find(query).populate('status');
+  const applications = await Application.find(query).populate('status'); //Index Usage 
   
   // Calculates statistics in memory
   const total = applications.length;
